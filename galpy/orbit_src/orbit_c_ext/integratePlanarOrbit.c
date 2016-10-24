@@ -21,16 +21,6 @@ void evalPlanarRectDeriv(double, double *, double *,
 			 int, struct potentialArg *);
 void evalPlanarRectDeriv_dxdv(double, double *, double *,
 			      int, struct potentialArg *);
-double calcPlanarRforce(double, double, double, 
-			int, struct potentialArg *);
-double calcPlanarphiforce(double, double, double, 
-			int, struct potentialArg *);
-double calcPlanarR2deriv(double, double, double, 
-			 int, struct potentialArg *);
-double calcPlanarphi2deriv(double, double, double, 
-			   int, struct potentialArg *);
-double calcPlanarRphideriv(double, double, double, 
-			   int, struct potentialArg *);
 /*
   Actual functions
 */
@@ -178,6 +168,45 @@ void parse_leapFuncArgs(int npot,struct potentialArg * potentialArgs,
       potentialArgs->planarphi2deriv= &ZeroPlanarForce;
       potentialArgs->planarRphideriv= &ZeroPlanarForce;
       potentialArgs->nargs= 2;
+      break;
+    case 19: //KuzminDiskPotential, 2 arguments
+      potentialArgs->planarRforce= &KuzminDiskPotentialPlanarRforce;
+      potentialArgs->planarphiforce= &ZeroPlanarForce;
+      potentialArgs->planarR2deriv= &KuzminDiskPotentialPlanarR2deriv;
+      potentialArgs->planarphi2deriv= &ZeroPlanarForce;
+      potentialArgs->planarRphideriv= &ZeroPlanarForce;
+      potentialArgs->nargs= 2;
+      break;
+    case 20: //BurkertPotential, 2 arguments
+      potentialArgs->planarRforce= &BurkertPotentialPlanarRforce;
+      potentialArgs->planarphiforce= &ZeroPlanarForce;
+      potentialArgs->planarR2deriv= &BurkertPotentialPlanarR2deriv;
+      potentialArgs->planarphi2deriv= &ZeroPlanarForce;
+      potentialArgs->planarRphideriv= &ZeroPlanarForce;
+      potentialArgs->nargs= 2;
+      break;
+    case 21: //TriaxialHernquistPotential, lots of arguments
+      potentialArgs->planarRforce= &TriaxialHernquistPotentialPlanarRforce;
+      potentialArgs->planarphiforce= &TriaxialHernquistPotentialPlanarphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;
+    case 22: //TriaxialNFWPotential, lots of arguments
+      potentialArgs->planarRforce= &TriaxialNFWPotentialPlanarRforce;
+      potentialArgs->planarphiforce= &TriaxialNFWPotentialPlanarphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;
+    case 23: //TriaxialJaffePotential, lots of arguments
+      potentialArgs->planarRforce= &TriaxialJaffePotentialPlanarRforce;
+      potentialArgs->planarphiforce= &TriaxialJaffePotentialPlanarphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;    
+    case 24: //SCFPotential, many arguments
+      potentialArgs->planarRforce= &SCFPotentialPlanarRforce;
+      potentialArgs->planarphiforce= &SCFPotentialPlanarphiforce;
+      potentialArgs->planarR2deriv= &SCFPotentialPlanarR2deriv;
+      potentialArgs->planarphi2deriv= &SCFPotentialPlanarphi2deriv;
+      potentialArgs->planarRphideriv= &SCFPotentialPlanarRphideriv;
+      potentialArgs->nargs= (int) (5 + (1 + *(pot_args + 1)) * *(pot_args+2) * *(pot_args+3)* *(pot_args+4) + 7);
       break;
     }
     potentialArgs->args= (double *) malloc( potentialArgs->nargs * sizeof(double));
@@ -358,31 +387,6 @@ void evalPlanarRectDeriv(double t, double *q, double *a,
   *a= sinphi*Rforce+1./R*cosphi*phiforce;
 }
 
-double calcPlanarRforce(double R, double phi, double t, 
-			int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double Rforce= 0.;
-  for (ii=0; ii < nargs; ii++){
-    Rforce+= potentialArgs->planarRforce(R,phi,t,
-					 potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return Rforce;
-}
-double calcPlanarphiforce(double R, double phi, double t, 
-			  int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double phiforce= 0.;
-  for (ii=0; ii < nargs; ii++){
-    phiforce+= potentialArgs->planarphiforce(R,phi,t,
-					     potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return phiforce;
-}
-
 void evalPlanarRectDeriv_dxdv(double t, double *q, double *a,
 			      int nargs, struct potentialArg * potentialArgs){
   double sinphi, cosphi, x, y, phi,R,Rforce,phiforce;
@@ -434,42 +438,4 @@ void evalPlanarRectDeriv_dxdv(double t, double *q, double *a,
     -cosphi*cosphi/R/R*phi2deriv;
   *a++= dFxdx * *(q+4) + dFxdy * *(q+5);
   *a= dFydx * *(q+4) + dFydy * *(q+5);
-}
-
-double calcPlanarR2deriv(double R, double phi, double t, 
-			 int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double R2deriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    R2deriv+= potentialArgs->planarR2deriv(R,phi,t,
-					   potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return R2deriv;
-}
-
-double calcPlanarphi2deriv(double R, double phi, double t, 
-			 int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double phi2deriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    phi2deriv+= potentialArgs->planarphi2deriv(R,phi,t,
-					       potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return phi2deriv;
-}
-double calcPlanarRphideriv(double R, double phi, double t, 
-			 int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double Rphideriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    Rphideriv+= potentialArgs->planarRphideriv(R,phi,t,
-					       potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return Rphideriv;
 }

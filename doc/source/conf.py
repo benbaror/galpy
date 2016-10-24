@@ -38,16 +38,16 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'galpy'
-copyright = u'2010 - 2015, Jo Bovy'
+copyright = u'2010 - 2016, Jo Bovy'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '1.1'
+version = '1.2'
 # The full version, including alpha/beta/rc tags.
-release = '1.1'
+release = '1.2'
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     version= 'v'+version

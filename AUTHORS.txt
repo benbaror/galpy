@@ -1,8 +1,15 @@
 Author:
+=======
 
-Jo Bovy <bovy@ias.edu>
+Jo Bovy <bovy@astro.utoronto.ca>
+
+Major contributions:
+=====================
+
+Aladdin Seaifan (KuzminDiskPotential,SCFPotential)
 
 Direct contributions to the code base:
+=======================================
 
 Denis Erkal (_mass for TwoPowerSphericalPotential; also simulations to test streamgapdf)
 Mark Fardal (streamdf improvements)
@@ -11,10 +18,12 @@ Jason Sanders (velocity kicks induced by interactions with Plummer, Hernquist, a
 Wilma Trick (KuzminKutuzovPotential and various other contributions)
 
 General help:
+==============
 
 Greg Stinson (advice on SnapshotRZPotential tests)
 
 Bug reports:
+============
 (incomplete list, apologies if I forgot anybody!)
 
 Alexander de la Vega
@@ -26,3 +35,5 @@ Resmi Lekshmi
 Rok Roskar
 Dylan Gregersen
 Eduardo Balbinot
+Semyeong Oh
+Jorrit Hagen

@@ -21,18 +21,6 @@ void evalRectDeriv(double, double *, double *,
 			 int, struct potentialArg *);
 void evalRectDeriv_dxdv(double,double *, double *,
 			      int, struct potentialArg *);
-double calcRforce(double, double,double, double, 
-			int, struct potentialArg *);
-double calczforce(double, double,double, double, 
-			int, struct potentialArg *);
-double calcPhiforce(double, double,double, double, 
-			int, struct potentialArg *);
-double calcR2deriv(double, double, double,double, 
-			 int, struct potentialArg *);
-double calcphi2deriv(double, double, double,double, 
-			   int, struct potentialArg *);
-double calcRphideriv(double, double, double,double, 
-			   int, struct potentialArg *);
 /*
   Actual functions
 */
@@ -189,6 +177,42 @@ void parse_leapFuncArgs_Full(int npot,
       potentialArgs->phiforce= &ZeroForce;
       //potentialArgs->R2deriv= &PseudoIsothermalPotentialR2deriv;
       potentialArgs->nargs= 2;
+      break;
+    case 19: //KuzminDiskPotential, 2 arguments
+      potentialArgs->Rforce= &KuzminDiskPotentialRforce;
+      potentialArgs->zforce= &KuzminDiskPotentialzforce;
+      potentialArgs->phiforce= &ZeroForce;
+      potentialArgs->nargs= 2;
+      break;
+    case 20: //BurkertPotential, 2 arguments
+      potentialArgs->Rforce= &BurkertPotentialRforce;
+      potentialArgs->zforce= &BurkertPotentialzforce;
+      potentialArgs->phiforce= &ZeroForce;
+      potentialArgs->nargs= 2;
+      break;
+    case 21: //TriaxialHernquistPotential, lots of arguments
+      potentialArgs->Rforce= &TriaxialHernquistPotentialRforce;
+      potentialArgs->zforce= &TriaxialHernquistPotentialzforce;
+      potentialArgs->phiforce= &TriaxialHernquistPotentialphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;
+    case 22: //TriaxialNFWPotential, lots of arguments
+      potentialArgs->Rforce= &TriaxialNFWPotentialRforce;
+      potentialArgs->zforce= &TriaxialNFWPotentialzforce;
+      potentialArgs->phiforce= &TriaxialNFWPotentialphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;
+    case 23: //TriaxialJaffePotential, lots of arguments
+      potentialArgs->Rforce= &TriaxialJaffePotentialRforce;
+      potentialArgs->zforce= &TriaxialJaffePotentialzforce;
+      potentialArgs->phiforce= &TriaxialJaffePotentialphiforce;
+      potentialArgs->nargs= (int) (21 + 2 * *(pot_args+14));
+      break;      
+    case 24: //SCFPotential, many arguments
+      potentialArgs->Rforce= &SCFPotentialRforce;
+      potentialArgs->zforce= &SCFPotentialzforce;
+      potentialArgs->phiforce= &SCFPotentialphiforce;
+      potentialArgs->nargs= (int) (5 + (1 + *(pot_args + 1)) * *(pot_args+2) * *(pot_args+3)* *(pot_args+4) + 7);
       break;
     }
     potentialArgs->args= (double *) malloc( potentialArgs->nargs * sizeof(double));
@@ -390,42 +414,6 @@ void evalRectDeriv(double t, double *q, double *a,
   *a= zforce;
 }
 
-double calcRforce(double R, double Z, double phi, double t, 
-		  int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double Rforce= 0.;
-  for (ii=0; ii < nargs; ii++){
-    Rforce+= potentialArgs->Rforce(R,Z,phi,t,
-				   potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return Rforce;
-}
-double calczforce(double R, double Z, double phi, double t, 
-		  int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double zforce= 0.;
-  for (ii=0; ii < nargs; ii++){
-    zforce+= potentialArgs->zforce(R,Z,phi,t,
-				   potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return zforce;
-}
-double calcPhiforce(double R, double Z, double phi, double t, 
-			  int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double phiforce= 0.;
-  for (ii=0; ii < nargs; ii++){
-    phiforce+= potentialArgs->phiforce(R,Z,phi,t,
-				       potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return phiforce;
-}
 // LCOV_EXCL_START
 void evalRectDeriv_dxdv(double t, double *q, double *a,
 			int nargs, struct potentialArg * potentialArgs){
@@ -486,41 +474,4 @@ void evalRectDeriv_dxdv(double t, double *q, double *a,
   *a= 0; //BOVY: PUT IN Z2DERIVS
 }
 
-double calcR2deriv(double R, double Z, double phi, double t, 
-		   int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double R2deriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    R2deriv+= potentialArgs->R2deriv(R,Z,phi,t,
-				     potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return R2deriv;
-}
-
-double calcphi2deriv(double R, double Z, double phi, double t, 
-			 int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double phi2deriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    phi2deriv+= potentialArgs->phi2deriv(R,Z,phi,t,
-					 potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return phi2deriv;
-}
-double calcRphideriv(double R, double Z, double phi, double t, 
-			   int nargs, struct potentialArg * potentialArgs){
-  int ii;
-  double Rphideriv= 0.;
-  for (ii=0; ii < nargs; ii++){
-    Rphideriv+= potentialArgs->Rphideriv(R,Z,phi,t,
-					 potentialArgs);
-    potentialArgs++;
-  }
-  potentialArgs-= nargs;
-  return Rphideriv;
-}
 // LCOV_EXCL_STOP

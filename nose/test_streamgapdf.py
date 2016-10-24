@@ -1,6 +1,7 @@
 import numpy
 from nose.tools import raises
 numpy.random.seed(1)
+from scipy import integrate
 sdf_sanders15= None #so we can set this up and then use in other tests
 sdf_sanders15_unp= None #so we can set this up and then use in other tests
 sdfl_sanders15= None #so we can set this up and then use in other tests
@@ -241,26 +242,26 @@ def test_deltaAngleTrackImpact():
 def test_trackNearImpact():
     # Sanity checks against numbers taken from plots of the simulation
     # Make sure we're near 14.5
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,0]*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,0]*sdf_sanders15._ro
                       -14.5) < 0.2, '14th point along track near the impact is not near 14.5 kpc'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,1]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,1]*sdf_sanders15._vo
                       -80) < 3., 'Point along the track near impact near R=14.5 does not have the correct radial velocity'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,2]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,2]*sdf_sanders15._vo
                       -220.) < 3., 'Point along the track near impact near R=14.5 does not have the correct tangential velocity'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,3]*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,3]*sdf_sanders15._ro
                       -0.) < 1., 'Point along the track near impact near R=14.5 does not have the correct vertical height'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,4]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[14,4]*sdf_sanders15._vo
                       -200.) < 5., 'Point along the track near impact near R=14.5 does not have the correct vertical velocity'
     # Another one!
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,0]*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,0]*sdf_sanders15._ro
                       -16.25) < 0.2, '27th point along track near the impact is not near 16.25 kpc'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,1]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,1]*sdf_sanders15._vo
                       +130) < 3., 'Point along the track near impact near R=16.25 does not have the correct radial velocity'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,2]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,2]*sdf_sanders15._vo
                       -200.) < 3., 'Point along the track near impact near R=16.25 does not have the correct tangential velocity'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,3]*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,3]*sdf_sanders15._ro
                       +12.) < 1., 'Point along the track near impact near R=16.25 does not have the correct vertical height'
-    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,4]*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,4]*sdf_sanders15._vo
                       -25.) < 5., 'Point along the track near impact near R=16.25 does not have the correct vertical velocity'   
     assert numpy.fabs(sdf_sanders15._gap_ObsTrack[27,5]-1.2) < .2, 'Point along the track near impact near R=16.25 does not have the correct azimuth'   
     return None
@@ -269,17 +270,17 @@ def test_interpolatedTrackNearImpact():
     # Sanity checks against numbers taken from plots of the simulation
     # Make sure we're near X=-10.9
     theta= 2.7
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackX(theta)*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackX(theta)*sdf_sanders15._ro
                       +10.9) < 0.2, 'Point along track near the impact at theta=2.7 is not near X=-10.9 kpc'
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackY(theta)*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackY(theta)*sdf_sanders15._ro
                       -6.) < 0.5, 'Point along track near the impact at theta=2.7 is not near Y=6. kpc'
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackZ(theta)*sdf_sanders15._Rnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackZ(theta)*sdf_sanders15._ro
                       +5.) < 0.5, 'Point along track near the impact at theta=2.7 is not near Z=5. kpc'
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackvX(theta)*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackvX(theta)*sdf_sanders15._vo
                       +180.) < 5, 'Point along track near the impact at theta=2.7 is not near vX=-180 km/s'
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackvY(theta)*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackvY(theta)*sdf_sanders15._vo
                       +190.) < 5., 'Point along track near the impact at theta=2.7 is not near vY=190 km/s'
-    assert numpy.fabs(sdf_sanders15._kick_interpTrackvZ(theta)*sdf_sanders15._Vnorm
+    assert numpy.fabs(sdf_sanders15._kick_interpTrackvZ(theta)*sdf_sanders15._vo
                       -170.) < 5., 'Point along track near the impact at theta=2.7 is not near vZ=170 km/s'
     return None
 
@@ -288,18 +289,18 @@ def test_kickdv():
     # Closest one to the impact point, should be close to zero
     tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
                                        -sdf_sanders15._impact_angle))
-    assert numpy.all(numpy.fabs(sdf_sanders15._kick_deltav[tIndx]*sdf_sanders15._Vnorm) < 0.3), 'Kick near the impact point not close to zero'
+    assert numpy.all(numpy.fabs(sdf_sanders15._kick_deltav[tIndx]*sdf_sanders15._vo) < 0.3), 'Kick near the impact point not close to zero'
     # The peak, size and location
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,0]*sdf_sanders15._Vnorm))-0.35) < 0.06, 'Peak dvx incorrect'
-    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,0]*sdf_sanders15._Vnorm)]-sdf_sanders15._impact_angle < 0., 'Location of peak dvx incorrect'
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,1]*sdf_sanders15._Vnorm))-0.35) < 0.06, 'Peak dvy incorrect'
-    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,1]*sdf_sanders15._Vnorm)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvy incorrect'
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,2]*sdf_sanders15._Vnorm))-1.8) < 0.06, 'Peak dvz incorrect'
-    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,2]*sdf_sanders15._Vnorm)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvz incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,0]*sdf_sanders15._vo))-0.35) < 0.06, 'Peak dvx incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,0]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle < 0., 'Location of peak dvx incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,1]*sdf_sanders15._vo))-0.35) < 0.06, 'Peak dvy incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,1]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvy incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_deltav[:,2]*sdf_sanders15._vo))-1.8) < 0.06, 'Peak dvz incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_deltav[:,2]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvz incorrect'
     # Close to zero far from impact point
     tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
                                        -sdf_sanders15._impact_angle-1.5))
-    assert numpy.all(numpy.fabs(sdf_sanders15._kick_deltav[tIndx]*sdf_sanders15._Vnorm) < 0.3), 'Kick far the impact point not close to zero'
+    assert numpy.all(numpy.fabs(sdf_sanders15._kick_deltav[tIndx]*sdf_sanders15._vo) < 0.3), 'Kick far the impact point not close to zero'
     return None
 
 # Test the calculation of the kicks in dO
@@ -308,18 +309,18 @@ def test_kickdO():
     # Closest one to the impact point, should be close to zero
     tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
                                        -sdf_sanders15._impact_angle))
-    assert numpy.all(numpy.fabs(sdf_sanders15._kick_dOap[tIndx,:3]*bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)) < 0.03), 'Kick near the impact point not close to zero'
+    assert numpy.all(numpy.fabs(sdf_sanders15._kick_dOap[tIndx,:3]*bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)) < 0.03), 'Kick near the impact point not close to zero'
     # The peak, size and location
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,0]*bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)))-0.085) < 0.01, 'Peak dOR incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,0]*bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)))-0.085) < 0.01, 'Peak dOR incorrect'
     assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_dOap[:,0])]-sdf_sanders15._impact_angle < 0., 'Location of peak dOR incorrect'
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,1]*bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)))-0.07) < 0.01, 'Peak dOp incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,1]*bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)))-0.07) < 0.01, 'Peak dOp incorrect'
     assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_dOap[:,1])]-sdf_sanders15._impact_angle < 0., 'Location of peak dvy incorrect'
-    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,2]*bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)))-0.075) < 0.01, 'Peak dOz incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(sdf_sanders15._kick_dOap[:,2]*bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)))-0.075) < 0.01, 'Peak dOz incorrect'
     assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(sdf_sanders15._kick_dOap[:,2])]-sdf_sanders15._impact_angle < 0., 'Location of peak dOz incorrect'
     # Close to zero far from impact point
     tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
                                        -sdf_sanders15._impact_angle-1.5))
-    assert numpy.all(numpy.fabs(sdf_sanders15._kick_dOap[tIndx,:3]*bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)) < 0.03), 'Kick far the impact point not close to zero'
+    assert numpy.all(numpy.fabs(sdf_sanders15._kick_dOap[tIndx,:3]*bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)) < 0.03), 'Kick far the impact point not close to zero'
     return None
 
 def test_kickda():
@@ -331,7 +332,7 @@ def test_kickda():
 # Test the interpolation of the kicks
 def test_interpKickdO():
     from galpy.util import bovy_conversion
-    freqConv= bovy_conversion.freq_in_Gyr(sdf_sanders15._Vnorm,sdf_sanders15._Rnorm)
+    freqConv= bovy_conversion.freq_in_Gyr(sdf_sanders15._vo,sdf_sanders15._ro)
     # Bunch of spot checks at some interesting angles
     # Impact angle
     theta= sdf_sanders15._impact_angle
@@ -349,6 +350,17 @@ def test_interpKickdO():
     assert numpy.fabs(sdf_sanders15._kick_interpdOr(theta)*freqConv-0.05) < 0.01, 'Frequency kick near the impact point is not zero'
     assert numpy.fabs(sdf_sanders15._kick_interpdOp(theta)*freqConv-0.035) < 0.01, 'Frequency kick near the impact point is not zero'
     assert numpy.fabs(sdf_sanders15._kick_interpdOz(theta)*freqConv-0.04) < 0.01, 'Frequency kick near the impact point is not zero'
+    # One beyond ._deltaAngleTrackImpact
+    theta= sdf_sanders15._deltaAngleTrackImpact+0.1
+    assert numpy.fabs(sdf_sanders15._kick_interpdOpar(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdOperp0(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdOperp1(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdOr(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdOp(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdOz(theta)*freqConv) < 10.**-16., 'Frequency kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdar(theta)) < 10.**-16., 'Angle kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdap(theta)) < 10.**-16., 'Angle kick beyond ._deltaAngleTrackImpact is not zero'
+    assert numpy.fabs(sdf_sanders15._kick_interpdaz(theta)) < 10.**-16., 'Angle kick beyond ._deltaAngleTrackImpact is not zero'
     return None
 
 def test_interpKickda():
@@ -357,58 +369,28 @@ def test_interpKickda():
                          < 2.*numpy.fabs(sdf_sanders15._kick_interpdOr(thetas)/sdf_sanders15._progenitor_Omegar)), 'Interpolated angle kick not everywhere smaller than the frequency kick after one period'
     return None
 
-# Test rewind_angle
-def test_rewind_angle_impact():
-    from galpy.df import streamgapdf
-    # Check that the equation is solved correctly for a few points
-    theta= sdf_sanders15._impact_angle
-    rew_theta= sdf_sanders15._rewind_angle_impact(theta)
-    pred= rew_theta\
-        +(super(streamgapdf,sdf_sanders15).meanOmega(rew_theta,oned=True,
-                                                     tdisrupt=sdf_sanders15._tdisrupt-sdf_sanders15._timpact)\
-              +sdf_sanders15._kick_interpdOpar(rew_theta))\
-              *sdf_sanders15._timpact
-    assert numpy.fabs(theta-pred) < 10.**-2., 'Angle rewinding fails by %g' % (numpy.fabs(theta-pred))
-    theta= 2.
-    rew_theta= sdf_sanders15._rewind_angle_impact(theta)
-    pred= rew_theta\
-        +(super(streamgapdf,sdf_sanders15).meanOmega(rew_theta,oned=True,
-                                                     tdisrupt=sdf_sanders15._tdisrupt-sdf_sanders15._timpact)\
-              +sdf_sanders15._kick_interpdOpar(rew_theta))\
-              *sdf_sanders15._timpact
-    assert numpy.fabs(theta-pred) < 10.**-2., 'Angle rewinding fails by %g' % (numpy.fabs(theta-pred))
-    theta= 5.
-    rew_theta= sdf_sanders15._rewind_angle_impact(theta)
-    pred= rew_theta\
-        +(super(streamgapdf,sdf_sanders15).meanOmega(rew_theta,oned=True,
-                                                     tdisrupt=sdf_sanders15._tdisrupt-sdf_sanders15._timpact)\
-              +sdf_sanders15._kick_interpdOpar(rew_theta))\
-              *sdf_sanders15._timpact
-    assert numpy.fabs(theta-pred) < 10.**-2., 'Angle rewinding fails by %g' % (numpy.fabs(theta-pred))
-    return None
-
 # Test the sampling of present-day perturbed points based on the model
 def test_sample():
     # Sample stars from the model and compare them to the stream
     xv_mock_per= sdf_sanders15.sample(n=100000,xy=True).T
     # Rough gap-density check
-    ingap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._Rnorm > 4.)\
-                         *(xv_mock_per[:,0]*sdf_sanders15._Rnorm < 5.))
-    edgegap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._Rnorm > 1.)\
-                         *(xv_mock_per[:,0]*sdf_sanders15._Rnorm < 2.))
-    outgap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._Rnorm > -2.5)\
-                         *(xv_mock_per[:,0]*sdf_sanders15._Rnorm < -1.5))
+    ingap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._ro > 4.)\
+                         *(xv_mock_per[:,0]*sdf_sanders15._ro < 5.))
+    edgegap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._ro > 1.)\
+                         *(xv_mock_per[:,0]*sdf_sanders15._ro < 2.))
+    outgap= numpy.sum((xv_mock_per[:,0]*sdf_sanders15._ro > -2.5)\
+                         *(xv_mock_per[:,0]*sdf_sanders15._ro < -1.5))
     assert numpy.fabs(ingap/float(edgegap)-0.015/0.05) < 0.05, 'gap density versus edge of the gap is incorect'
     assert numpy.fabs(ingap/float(outgap)-0.015/0.02) < 0.2, 'gap density versus outside of the gap is incorect'
     # Test track of the stream
-    tIndx= (xv_mock_per[:,0]*sdf_sanders15._Rnorm > 4.)\
-        *(xv_mock_per[:,0]*sdf_sanders15._Rnorm < 5.)\
-        *(xv_mock_per[:,1]*sdf_sanders15._Rnorm < 5.)
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1])*sdf_sanders15._Rnorm+12.25) < 0.1, 'Location of mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2])*sdf_sanders15._Rnorm-3.8) < 0.1, 'Location of mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3])*sdf_sanders15._Vnorm-255.) < 2., 'Location of mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4])*sdf_sanders15._Vnorm-20.) < 2., 'Location of mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5])*sdf_sanders15._Vnorm+185.) < 2., 'Location of mock track is incorrect near the gap'
+    tIndx= (xv_mock_per[:,0]*sdf_sanders15._ro > 4.)\
+        *(xv_mock_per[:,0]*sdf_sanders15._ro < 5.)\
+        *(xv_mock_per[:,1]*sdf_sanders15._ro < 5.)
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1])*sdf_sanders15._ro+12.25) < 0.1, 'Location of mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2])*sdf_sanders15._ro-3.8) < 0.1, 'Location of mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3])*sdf_sanders15._vo-255.) < 2., 'Location of mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4])*sdf_sanders15._vo-20.) < 2., 'Location of mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5])*sdf_sanders15._vo+185.) < 2., 'Location of mock track is incorrect near the gap'
     return None
 
 # Test the sampling of present-day perturbed-unperturbed points
@@ -420,15 +402,15 @@ def test_sample_offset():
     numpy.random.seed(1) # should give same points
     xv_mock_unp= sdf_sanders15_unp.sample(n=100000,xy=True).T
     # Test perturbation as a function of unperturbed X
-    tIndx= (xv_mock_unp[:,0]*sdf_sanders15._Rnorm > 0.)\
-        *(xv_mock_unp[:,0]*sdf_sanders15._Rnorm < 1.)\
-        *(xv_mock_unp[:,1]*sdf_sanders15._Rnorm < 5.)
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,0]-xv_mock_unp[tIndx,0])*sdf_sanders15._Rnorm+0.65) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1]-xv_mock_unp[tIndx,1])*sdf_sanders15._Rnorm-0.1) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2]-xv_mock_unp[tIndx,2])*sdf_sanders15._Rnorm-0.4) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3]-xv_mock_unp[tIndx,3])*sdf_sanders15._Vnorm) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4]-xv_mock_unp[tIndx,4])*sdf_sanders15._Vnorm+7.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5]-xv_mock_unp[tIndx,5])*sdf_sanders15._Vnorm-4.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    tIndx= (xv_mock_unp[:,0]*sdf_sanders15._ro > 0.)\
+        *(xv_mock_unp[:,0]*sdf_sanders15._ro < 1.)\
+        *(xv_mock_unp[:,1]*sdf_sanders15._ro < 5.)
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,0]-xv_mock_unp[tIndx,0])*sdf_sanders15._ro+0.65) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1]-xv_mock_unp[tIndx,1])*sdf_sanders15._ro-0.1) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2]-xv_mock_unp[tIndx,2])*sdf_sanders15._ro-0.4) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3]-xv_mock_unp[tIndx,3])*sdf_sanders15._vo) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4]-xv_mock_unp[tIndx,4])*sdf_sanders15._vo+7.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5]-xv_mock_unp[tIndx,5])*sdf_sanders15._vo-4.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
     return None
 
 # Test the sampling of present-day perturbed-unperturbed points
@@ -440,15 +422,145 @@ def test_sample_offset_leading():
     numpy.random.seed(1) # should give same points
     xv_mock_unp= sdfl_sanders15_unp.sample(n=100000,xy=True).T
     # Test perturbation as a function of unperturbed X
-    tIndx= (xv_mock_unp[:,0]*sdfl_sanders15._Rnorm > 13.)\
-        *(xv_mock_unp[:,0]*sdfl_sanders15._Rnorm < 14.)\
-        *(xv_mock_unp[:,1]*sdfl_sanders15._Rnorm > 5.)
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,0]-xv_mock_unp[tIndx,0])*sdfl_sanders15._Rnorm+0.5) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1]-xv_mock_unp[tIndx,1])*sdfl_sanders15._Rnorm-0.3) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2]-xv_mock_unp[tIndx,2])*sdfl_sanders15._Rnorm-0.45) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3]-xv_mock_unp[tIndx,3])*sdfl_sanders15._Vnorm+2.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4]-xv_mock_unp[tIndx,4])*sdfl_sanders15._Vnorm+7.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
-    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5]-xv_mock_unp[tIndx,5])*sdfl_sanders15._Vnorm-6.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    tIndx= (xv_mock_unp[:,0]*sdfl_sanders15._ro > 13.)\
+        *(xv_mock_unp[:,0]*sdfl_sanders15._ro < 14.)\
+        *(xv_mock_unp[:,1]*sdfl_sanders15._ro > 5.)
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,0]-xv_mock_unp[tIndx,0])*sdfl_sanders15._ro+0.5) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,1]-xv_mock_unp[tIndx,1])*sdfl_sanders15._ro-0.3) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,2]-xv_mock_unp[tIndx,2])*sdfl_sanders15._ro-0.45) < 0.1, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,3]-xv_mock_unp[tIndx,3])*sdfl_sanders15._vo+2.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,4]-xv_mock_unp[tIndx,4])*sdfl_sanders15._vo+7.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    assert numpy.fabs(numpy.median(xv_mock_per[tIndx,5]-xv_mock_unp[tIndx,5])*sdfl_sanders15._vo-6.) < 0.5, 'Location of perturbed mock track is incorrect near the gap'
+    return None
+
+# Tests of the density and meanOmega functions
+
+def test_pOparapar():
+    #Test that integrating pOparapar gives density_par
+    dens_frompOpar_close=\
+        integrate.quad(lambda x: sdf_sanders15.pOparapar(x,0.3),
+                       sdf_sanders15._meandO\
+                           -10.*numpy.sqrt(sdf_sanders15._sortedSigOEig[2]),
+                       sdf_sanders15._meandO\
+                           +10.*numpy.sqrt(sdf_sanders15._sortedSigOEig[2]))[0]
+    # This is actually in the gap!
+    dens_fromOpar_half=\
+        integrate.quad(lambda x: sdf_sanders15.pOparapar(x,2.6),
+                       sdf_sanders15._meandO\
+                           -10.*numpy.sqrt(sdf_sanders15._sortedSigOEig[2]),
+                       sdf_sanders15._meandO\
+                           +10.*numpy.sqrt(sdf_sanders15._sortedSigOEig[2]))[0]
+    assert numpy.fabs(dens_fromOpar_half/dens_frompOpar_close-sdf_sanders15.density_par(2.6)/sdf_sanders15.density_par(0.3)) < 10.**-4., 'density from integrating pOparapar not equal to that from density_par for Sanders15 stream'
+    return None
+
+def test_density_apar_approx():
+    # Test that the approximate density agrees with the direct integration
+    # Need to do this relatively to another density, because there is an
+    # overall offset
+    apar= 2.6
+    assert numpy.fabs(sdf_sanders15.density_par(apar,approx=False)/sdf_sanders15.density_par(apar,approx=True)/sdf_sanders15.density_par(0.3,approx=False)*sdf_sanders15.density_par(0.3,approx=True)-1.) < 10.**-3., 'Approximate density does not agree with direct integration'
+    apar= 2.3
+    assert numpy.fabs(sdf_sanders15.density_par(apar,approx=False)/sdf_sanders15.density_par(apar,approx=True)/sdf_sanders15.density_par(0.3,approx=False)*sdf_sanders15.density_par(0.3,approx=True)-1.) < 10.**-3., 'Approximate density does not agree with direct integration'
+    return None
+
+def test_density_apar_approx_higherorder():
+    # Test that the approximate density agrees with the direct integration
+    # Need to do this relatively to another density, because there is an
+    # overall offset
+    apar= 2.6
+    assert numpy.fabs(sdf_sanders15.density_par(apar,approx=False)/sdf_sanders15.density_par(apar,approx=True,higherorder=True)/sdf_sanders15.density_par(0.3,approx=False)*sdf_sanders15.density_par(0.3,approx=True,higherorder=True)-1.) < 10.**-3., 'Approximate density does not agree with direct integration'
+    apar= 2.3
+    assert numpy.fabs(sdf_sanders15.density_par(apar,approx=False)/sdf_sanders15.density_par(apar,approx=True,higherorder=True)/sdf_sanders15.density_par(0.3,approx=False)*sdf_sanders15.density_par(0.3,approx=True,higherorder=True)-1.) < 10.**-3., 'Approximate density does not agree with direct integration'
+    return None
+
+def test_minOpar():
+    # Test that for Opar < minOpar, p(Opar,apar) is in fact zero!
+    apar= 0.3
+    dO= 10.**-4.
+    assert numpy.fabs(sdf_sanders15.pOparapar(sdf_sanders15.minOpar(apar)-dO,
+                                              apar)) < 10.**-16., 'Probability for Opar < minOpar is not zero'
+    apar= 2.6
+    dO= 10.**-4.
+    assert numpy.fabs(sdf_sanders15.pOparapar(sdf_sanders15.minOpar(apar)-dO,
+                                              apar)) < 10.**-16., 'Probability for Opar < minOpar is not zero'
+    return None
+
+def test_meanOmega_approx():
+    # Test that the approximate meanOmega agrees with the direct integration
+    # Need to do this relatively to another density, because there is an
+    # overall offset
+    apar= 2.6
+    assert numpy.fabs(sdf_sanders15.meanOmega(apar,approx=False,oned=True)/sdf_sanders15.meanOmega(apar,approx=True,oned=True)-1.) < 10.**-3., 'Approximate meanOmega does not agree with direct integration'
+    apar= 2.3
+    assert numpy.fabs(sdf_sanders15.meanOmega(apar,approx=False,oned=True)/sdf_sanders15.meanOmega(apar,approx=True,oned=True)-1.) < 10.**-3., 'Approximate meanOmega does not agree with direct integration'
+    return None
+
+def test_meanOmega_approx_higherorder():
+    # Test that the approximate meanOmega agrees with the direct integration
+    # Need to do this relatively to another density, because there is an
+    # overall offset
+    apar= 2.6
+    assert numpy.fabs(sdf_sanders15.meanOmega(apar,approx=False,oned=True)/sdf_sanders15.meanOmega(apar,approx=True,higherorder=True,oned=True)-1.) < 10.**-3., 'Approximate meanOmega does not agree with direct integration'
+    apar= 2.3
+    assert numpy.fabs(sdf_sanders15.meanOmega(apar,approx=False,oned=True)/sdf_sanders15.meanOmega(apar,approx=True,higherorder=True,oned=True)-1.) < 10.**-3., 'Approximate meanOmega does not agree with direct integration'
+    return None
+
+def test_hernquist():
+    # Test that Hernquist kicks are similar to Plummer kicks, but are
+    # different in understood ways (...)
+    from galpy.util import bovy_conversion
+    # Switch to Hernquist
+    V0, R0= 220., 8.
+    impactb=0.
+    subhalovel=numpy.array([6.82200571,132.7700529,
+                            149.4174464])/V0
+    impact_angle=-2.34
+    GM=10.**-2./bovy_conversion.mass_in_1010msol(V0,R0)
+    rs=0.625/R0
+    sdf_sanders15._determine_deltav_kick(impact_angle,impactb,subhalovel,
+                                         GM,rs,None,
+                                         3,True)
+    hernquist_kicks= sdf_sanders15._kick_deltav
+    # Back to Plummer
+    sdf_sanders15._determine_deltav_kick(impact_angle,impactb,subhalovel,
+                                         GM,rs,None,
+                                         3,False)
+    # Repeat some of the deltav tests from above
+    # Closest one to the impact point, should be close to zero
+    tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
+                                       -sdf_sanders15._impact_angle))
+    assert numpy.all(numpy.fabs(hernquist_kicks[tIndx]*sdf_sanders15._vo) < 0.4), 'Kick near the impact point not close to zero for Hernquist'
+    # The peak, size and location
+    # Peak should be slightly less (guessed these correct!)
+    assert numpy.fabs(numpy.amax(numpy.fabs(hernquist_kicks[:,0]*sdf_sanders15._vo))-0.25) < 0.06, 'Peak dvx incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(hernquist_kicks[:,0]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle < 0., 'Location of peak dvx incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(hernquist_kicks[:,1]*sdf_sanders15._vo))-0.25) < 0.06, 'Peak dvy incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(hernquist_kicks[:,1]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvy incorrect'
+    assert numpy.fabs(numpy.amax(numpy.fabs(hernquist_kicks[:,2]*sdf_sanders15._vo))-1.3) < 0.06, 'Peak dvz incorrect'
+    assert sdf_sanders15._kick_interpolatedThetasTrack[numpy.argmax(hernquist_kicks[:,2]*sdf_sanders15._vo)]-sdf_sanders15._impact_angle > 0., 'Location of peak dvz incorrect'
+    # Close to zero far from impact point
+    tIndx= numpy.argmin(numpy.fabs(sdf_sanders15._kick_interpolatedThetasTrack\
+                                       -sdf_sanders15._impact_angle-1.5))
+    assert numpy.all(numpy.fabs(hernquist_kicks[tIndx]*sdf_sanders15._vo) < 0.3), 'Kick far the impact point not close to zero'
+    return None
+
+@raises(ValueError)
+def test_determine_deltav_valueerrort():
+    # Test that modeling leading (trailing) impact for trailing (leading) arm
+    # raises a ValueError when using _determine_deltav_kick
+    from galpy.util import bovy_conversion
+    # Switch to Hernquist
+    V0, R0= 220., 8.
+    impactb=0.
+    subhalovel=numpy.array([6.82200571,132.7700529,
+                            149.4174464])/V0
+    impact_angle=-2.34
+    GM=10.**-2./bovy_conversion.mass_in_1010msol(V0,R0)
+    rs=0.625/R0
+    # Can't do minus impact angle!
+    sdf_sanders15._determine_deltav_kick(-impact_angle,impactb,subhalovel,
+                                         GM,rs,None,
+                                         3,True)
     return None
 
 # Test the routine that rotates vectors to an arbitrary vector

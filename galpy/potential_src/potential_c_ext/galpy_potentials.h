@@ -4,6 +4,9 @@
 */
 #ifndef __GALPY_POTENTIALS_H__
 #define __GALPY_POTENTIALS_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <interp_2d.h>
 struct potentialArg{
   double (*potentialEval)(double R, double Z, double phi, double t,
@@ -45,6 +48,28 @@ struct potentialArg{
 /*
   Function declarations
 */
+//Potential and force evaluation
+double evaluatePotentials(double,double,int, struct potentialArg *);
+double calcRforce(double,double,double,double,int,struct potentialArg *);
+double calczforce(double,double,double,double,int,struct potentialArg *);
+double calcPhiforce(double, double,double, double, 
+			int, struct potentialArg *);
+double calcR2deriv(double, double, double,double, 
+			 int, struct potentialArg *);
+double calcphi2deriv(double, double, double,double, 
+			   int, struct potentialArg *);
+double calcRphideriv(double, double, double,double, 
+			   int, struct potentialArg *);
+double calcPlanarRforce(double, double, double, 
+			int, struct potentialArg *);
+double calcPlanarphiforce(double, double, double, 
+			int, struct potentialArg *);
+double calcPlanarR2deriv(double, double, double, 
+			 int, struct potentialArg *);
+double calcPlanarphi2deriv(double, double, double, 
+			   int, struct potentialArg *);
+double calcPlanarRphideriv(double, double, double, 
+			   int, struct potentialArg *);
 //ZeroForce
 double ZeroPlanarForce(double,double,double,
 		       struct potentialArg *);
@@ -219,6 +244,18 @@ double KuzminKutuzovStaeckelPotentialzforce(double,double,double,double,
 				        struct potentialArg *);
 double KuzminKutuzovStaeckelPotentialPlanarR2deriv(double,double,double,
 					    struct potentialArg *);
+
+//KuzminDiskPotential
+double KuzminDiskPotentialEval(double,double,double,double,
+                        struct potentialArg *);
+double KuzminDiskPotentialRforce(double,double,double,double,
+                        struct potentialArg *);
+double KuzminDiskPotentialPlanarRforce(double,double,double,
+						struct potentialArg *);
+double KuzminDiskPotentialzforce(double,double,double,double,
+				        struct potentialArg *);
+double KuzminDiskPotentialPlanarR2deriv(double,double,double, 
+					    struct potentialArg *);
 //PlummerPotential
 double PlummerPotentialEval(double,double,double,double,
                         struct potentialArg *);
@@ -241,4 +278,77 @@ double PseudoIsothermalPotentialzforce(double,double,double,double,
 				       struct potentialArg *);
 double PseudoIsothermalPotentialPlanarR2deriv(double,double,double,
 					      struct potentialArg *);
+//BurkertPotential
+double BurkertPotentialEval(double,double,double,double,
+				     struct potentialArg *);
+double BurkertPotentialRforce(double,double,double,double,
+				       struct potentialArg *);
+double BurkertPotentialPlanarRforce(double,double,double,
+					     struct potentialArg *);
+double BurkertPotentialzforce(double,double,double,double,
+				       struct potentialArg *);
+double BurkertPotentialPlanarR2deriv(double,double,double,
+					      struct potentialArg *);
+//TriaxialHernquistPotential
+double TriaxialHernquistPotentialEval(double,double,double,double,
+				struct potentialArg *);
+double TriaxialHernquistPotentialRforce(double,double,double,double,
+					struct potentialArg *);
+double TriaxialHernquistPotentialPlanarRforce(double,double,double,
+					      struct potentialArg *);
+double TriaxialHernquistPotentialphiforce(double,double,double,double,
+					  struct potentialArg *);
+double TriaxialHernquistPotentialPlanarphiforce(double,double,double,
+						struct potentialArg *);
+double TriaxialHernquistPotentialzforce(double,double,double,double,
+					struct potentialArg *);
+//TriaxialNFWPotential
+double TriaxialNFWPotentialEval(double,double,double,double,
+				struct potentialArg *);
+double TriaxialNFWPotentialRforce(double,double,double,double,
+				  struct potentialArg *);
+double TriaxialNFWPotentialPlanarRforce(double,double,double,
+					struct potentialArg *);
+double TriaxialNFWPotentialphiforce(double,double,double,double,
+				    struct potentialArg *);
+double TriaxialNFWPotentialPlanarphiforce(double,double,double,
+					  struct potentialArg *);
+double TriaxialNFWPotentialzforce(double,double,double,double,
+				  struct potentialArg *);
+//TriaxialJaffePotential
+double TriaxialJaffePotentialEval(double,double,double,double,
+				struct potentialArg *);
+double TriaxialJaffePotentialRforce(double,double,double,double,
+				    struct potentialArg *);
+double TriaxialJaffePotentialPlanarRforce(double,double,double,
+					  struct potentialArg *);
+double TriaxialJaffePotentialphiforce(double,double,double,double,
+				      struct potentialArg *);
+double TriaxialJaffePotentialPlanarphiforce(double,double,double,
+					    struct potentialArg *);
+double TriaxialJaffePotentialzforce(double,double,double,double,
+				    struct potentialArg *);					      
+//SCFDiskPotential
+double SCFPotentialEval(double,double,double,double,
+				     struct potentialArg *);
+double SCFPotentialRforce(double,double,double,double,
+                        struct potentialArg *);
+double SCFPotentialzforce(double,double,double,double,
+				        struct potentialArg *);
+double SCFPotentialphiforce(double,double,double,double,
+				        struct potentialArg *);
+				        
+double SCFPotentialPlanarRforce(double,double,double,
+                        struct potentialArg *);
+double SCFPotentialPlanarphiforce(double,double,double,
+				        struct potentialArg *);
+double SCFPotentialPlanarR2deriv(double,double,double,
+				        struct potentialArg *);
+double SCFPotentialPlanarphi2deriv(double,double,double,
+				        struct potentialArg *);
+double SCFPotentialPlanarRphideriv(double,double,double,
+				        struct potentialArg *);
+#ifdef __cplusplus
+}
+#endif
 #endif /* galpy_potentials.h */
