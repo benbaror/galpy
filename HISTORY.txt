@@ -1,14 +1,6 @@
 v1.3 (2017-XX-XX)
 ==================
 
-- Allow transformations of (ra,dec) and (pmra,pmdec) to custom
-  coordinate systems.
-
-- Allow plotting of the spherical radius in Orbit.plot
-
-v1.2 (2016-09-06)
-==================
-
 - Changed arguments of Potential methods that need to be implemented
   for a new potential (e.g., _Rforce and _zforce) to only explicitly
   mention the necessary ones and use kwargs for remaining ones (so
@@ -17,6 +9,14 @@ v1.2 (2016-09-06)
   R,z,phi=0.,**kwargs; etc.). This breaks the example in Figure 4 of
   the galpy paper, where _Rforce and _zforce now require an additional
   *kwargs.
+
+- Allow transformations of (ra,dec) and (pmra,pmdec) to custom
+  coordinate systems.
+
+- Allow plotting of the spherical radius in Orbit.plot
+
+v1.2 (2016-09-06)
+==================
 
 - Added support for providing inputs to all initializations, methods,
   and functions as Quantities with units and for providing outputs as
