@@ -289,7 +289,7 @@ class SCFPotential(Potential):
             func[j] = nu.sum(self._compute(funcTilde, R[j][0],z[j][0],phi[j][0]))
         return func
         
-    def _dens(self, R, z, phi=0., t=0.):
+    def _dens(self, R, z, phi=0.,**kwargs):
         """
         NAME:
            _dens
@@ -309,7 +309,7 @@ class SCFPotential(Potential):
             phi= 0.
         return self._computeArray(self._rhoTilde, R,z,phi)
               
-    def _evaluate(self,R,z,phi=0.,t=0.):
+    def _evaluate(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _evaluate
@@ -438,7 +438,7 @@ class SCFPotential(Potential):
             self._computeforce(R[j][0],z[j][0],phi[j][0])
             force[j] = dr_dx[j][0]*dPhi_dr + dtheta_dx[j][0]*dPhi_dtheta +dPhi_dphi*dphi_dx[j][0]
         return force
-    def _Rforce(self, R, z, phi=0, t=0):
+    def _Rforce(self, R, z, phi=0,**kwargs):
         """
         NAME:
            _Rforce
@@ -461,7 +461,7 @@ class SCFPotential(Potential):
         dr_dR = nu.divide(R,r); dtheta_dR = nu.divide(z,r**2); dphi_dR = 0
         return self._computeforceArray(dr_dR, dtheta_dR, dphi_dR, R,z,phi)
         
-    def _zforce(self, R, z, phi=0., t=0.):
+    def _zforce(self, R, z, phi=0.,**kwargs):
         """
         NAME:
            _zforce
@@ -484,7 +484,7 @@ class SCFPotential(Potential):
         dr_dz = nu.divide(z,r); dtheta_dz = nu.divide(-R,r**2); dphi_dz = 0
         return self._computeforceArray(dr_dz, dtheta_dz, dphi_dz, R,z,phi)
         
-    def _phiforce(self, R,z,phi=0,t=0):
+    def _phiforce(self, R,z,phi=0,**kwargs):
         """
         NAME:
            _phiforce

@@ -170,7 +170,7 @@ class TwoPowerTriaxialPotential(Potential):
             self._glw*= 0.5
         return None
 
-    def _evaluate(self,R,z,phi=0.,t=0.):
+    def _evaluate(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _evaluate
@@ -220,7 +220,7 @@ class TwoPowerTriaxialPotential(Potential):
             return -self._b*self._c/self.a\
                 *_potInt(x,y,z,psi,self._b2,self._c2,glx=self._glx,glw=self._glw)
 
-    def _Rforce(self,R,z,phi=0.,t=0.):
+    def _Rforce(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _Rforce
@@ -263,7 +263,7 @@ class TwoPowerTriaxialPotential(Potential):
             Fx, Fy= Fxyz[0], Fxyz[1]
         return numpy.cos(phi)*Fx+numpy.sin(phi)*Fy
 
-    def _phiforce(self,R,z,phi=0.,t=0.):
+    def _phiforce(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _phiforce
@@ -306,7 +306,7 @@ class TwoPowerTriaxialPotential(Potential):
             Fx, Fy= Fxyz[0], Fxyz[1]
         return R*(-numpy.sin(phi)*Fx+numpy.cos(phi)*Fy)
 
-    def _zforce(self,R,z,phi=0.,t=0.):
+    def _zforce(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _zforce
@@ -373,7 +373,7 @@ class TwoPowerTriaxialPotential(Potential):
                        lambda m: (self.a/m)**self.alpha/(1.+m/self.a)**(self.beta-self.alpha),
                        self._b2,self._c2,2,glx=self._glx,glw=self._glw)
 
-    def _R2deriv(self,R,z,phi=0.,t=0.):
+    def _R2deriv(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _R2deriv
@@ -400,7 +400,7 @@ class TwoPowerTriaxialPotential(Potential):
         return numpy.cos(phi)**2.*phixx+numpy.sin(phi)**2.*phiyy\
             +2.*numpy.cos(phi)*numpy.sin(phi)*phixy
 
-    def _Rzderiv(self,R,z,phi=0.,t=0.):
+    def _Rzderiv(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _Rzderiv
@@ -425,7 +425,7 @@ class TwoPowerTriaxialPotential(Potential):
         phiyz= self._2ndderiv_xyz(x,y,z,1,2)
         return numpy.cos(phi)*phixz+numpy.sin(phi)*phiyz
 
-    def _z2deriv(self,R,z,phi=0.,t=0.):
+    def _z2deriv(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _z2deriv
@@ -448,7 +448,7 @@ class TwoPowerTriaxialPotential(Potential):
             raise NotImplementedError("2nd potential derivatives of TwoPowerTriaxialPotential not implemented for rotated coordinated frames (non-trivial zvec and pa)")
         return self._2ndderiv_xyz(x,y,z,2,2)
 
-    def _phi2deriv(self,R,z,phi=0.,t=0.):
+    def _phi2deriv(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _phi2deriv
@@ -478,7 +478,7 @@ class TwoPowerTriaxialPotential(Potential):
                           -2.*numpy.cos(phi)*numpy.sin(phi)*phixy)\
                           +R*(numpy.cos(phi)*Fx+numpy.sin(phi)*Fy)
 
-    def _Rphideriv(self,R,z,phi=0.,t=0.):
+    def _Rphideriv(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _Rphideriv
@@ -517,7 +517,7 @@ class TwoPowerTriaxialPotential(Potential):
                           lambda m: -(self.a/m)**self.alpha/(1.+m/self.a)**(self.beta-self.alpha)/self.a*(self.alpha*(self.a/m)+(self.beta-self.alpha)/(1.+m/self.a)),
                           self._b2,self._c2,i,j,glx=self._glx,glw=self._glw)
                  
-    def _dens(self,R,z,phi=0.,t=0.):
+    def _dens(self,R,z,phi=0.,**kwargs):
         """
         NAME:
            _dens

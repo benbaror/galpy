@@ -57,7 +57,7 @@ class KuzminDiskPotential(Potential):
         self.hasC_dxdv= True
         return None
 
-    def _evaluate(self,R,z,phi=0.,t=0.):
+    def _evaluate(self,R,z,**kwargs):
         """
         NAME:
            _evaluate
@@ -75,7 +75,7 @@ class KuzminDiskPotential(Potential):
         """
         return -self._denom(R, z)**-0.5
 
-    def _Rforce(self,R,z,phi=0.,t=0.):
+    def _Rforce(self,R,z,**kwargs):
         """
         NAME:
             _Rforce
@@ -93,7 +93,7 @@ class KuzminDiskPotential(Potential):
         """
         return -self._denom(R, z)**-1.5 * R
 
-    def _zforce(self, R, z, phi=0., t=0.):
+    def _zforce(self,R,z,**kwargs):
         """
         NAME:
            _zforce
@@ -111,7 +111,7 @@ class KuzminDiskPotential(Potential):
         """
         return -nu.sign(z) * self._denom(R,z)**-1.5 * (self._a + nu.fabs(z))
         
-    def _R2deriv(self,R,z,phi=0.,t=0.):
+    def _R2deriv(self,R,z,**kwargs):
         """
         NAME:
             _Rforce
@@ -129,7 +129,7 @@ class KuzminDiskPotential(Potential):
         """
         return self._denom(R, z)**-1.5 - 3.*R**2 * self._denom(R, z)**-2.5 
         
-    def _z2deriv(self,R,z,phi=0.,t=0.):
+    def _z2deriv(self,R,z,**kwargs):
         """
         NAME:
            _z2deriv
@@ -148,7 +148,7 @@ class KuzminDiskPotential(Potential):
         a = self._a
         return self._denom(R, z)**-1.5 - 3. * (a + nu.fabs(z))**2. * self._denom(R, z)**-2.5 
 
-    def _Rzderiv(self,R,z,phi=0.,t=0.):
+    def _Rzderiv(self,R,z,**kwargs):
         """
         NAME:
            _Rzderiv
