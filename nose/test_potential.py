@@ -2187,22 +2187,22 @@ class testMWPotential(Potential):
         self._potlist= potlist
         Potential.__init__(self,amp=1.)
         return None
-    def _evaluate(self,R,z,phi=0,t=0,dR=0,dphi=0):
+    def _evaluate(self,R,z,phi=0,t=0,dR=0,dphi=0,**kwargs):
         return evaluatePotentials(self._potlist,R,z,phi=phi,t=t,
                                   dR=dR,dphi=dphi)
-    def _Rforce(self,R,z,phi=0.,t=0.,v=None):
-        return evaluateRforces(self._potlist,R,z,phi=phi,t=t,v=v)
-    def _phiforce(self,R,z,phi=0.,t=0.,v=None):
-        return evaluatephiforces(self._potlist,R,z,phi=phi,t=t,v=v)
-    def _zforce(self,R,z,phi=0.,t=0.):
-        return evaluatezforces(self._potlist,R,z,phi=phi,t=t,v=v)
-    def _R2deriv(self,R,z,phi=0.,t=0.):
+    def _Rforce(self,R,z,phi=0.,t=0.,**kwargs):
+        return evaluateRforces(self._potlist,R,z,phi=phi,t=t)
+    def _phiforce(self,R,z,phi=0.,t=0.,**kwargs):
+        return evaluatephiforces(self._potlist,R,z,phi=phi,t=t)
+    def _zforce(self,R,z,phi=0.,t=0.,**kwargs):
+        return evaluatezforces(self._potlist,R,z,phi=phi,t=t)
+    def _R2deriv(self,R,z,phi=0.,t=0.,**kwargs):
         return evaluateR2derivs(self._potlist,R,z,phi=phi,t=t)
-    def _z2deriv(self,R,z,phi=0.,t=0.):
+    def _z2deriv(self,R,z,phi=0.,t=0.,**kwargs):
         return evaluatez2derivs(self._potlist,R,z,phi=phi,t=t)
-    def _Rzderiv(self,R,z,phi=0.,t=0.):
+    def _Rzderiv(self,R,z,phi=0.,t=0.,**kwargs):
         return evaluateRzderivs(self._potlist,R,z,phi=phi,t=t)
-    def _dens(self,R,z,phi=0.,t=0.,forcepoisson=False):
+    def _dens(self,R,z,phi=0.,t=0.,forcepoisson=False,**kwargs):
         return evaluateDensities(self._potlist,R,z,phi=phi,t=t,
                                  forcepoisson=forcepoisson)
     def vcirc(self,R):
@@ -2223,17 +2223,17 @@ class testplanarMWPotential(planarPotential):
         planarPotential.__init__(self,amp=1.)
         self.isNonAxi= True-numpy.prod([True-p.isNonAxi for p in self._potlist])
         return None
-    def _evaluate(self,R,phi=0,t=0,dR=0,dphi=0):
+    def _evaluate(self,R,phi=0,t=0,dR=0,dphi=0,**kwargs):
         return evaluateplanarPotentials(self._potlist,R,phi=phi,t=t)
-    def _Rforce(self,R,phi=0.,t=0.,v=None):
-        return evaluateplanarRforces(self._potlist,R,phi=phi,t=t,v=v)
-    def _phiforce(self,R,phi=0.,t=0.,v=None):
-        return evaluateplanarphiforces(self._potlist,R,phi=phi,t=t,v=v)
-    def _R2deriv(self,R,phi=0.,t=0.):
+    def _Rforce(self,R,phi=0.,t=0.,**kwargs):
+        return evaluateplanarRforces(self._potlist,R,phi=phi,t=t)
+    def _phiforce(self,R,phi=0.,t=0.,**kwargs):
+        return evaluateplanarphiforces(self._potlist,R,phi=phi,t=t)
+    def _R2deriv(self,R,phi=0.,t=0.,**kwargs):
         return evaluateplanarR2derivs(self._potlist,R,phi=phi,t=t)
-    def _phi2deriv(self,R,phi=0.,t=0.):
+    def _phi2deriv(self,R,phi=0.,t=0.,**kwargs):
         return evaluateplanarPotentials(self._potlist,R,phi=phi,t=t,dphi=2)
-    def _Rphideriv(self,R,phi=0.,t=0.):
+    def _Rphideriv(self,R,phi=0.,t=0.,**kwargs):
         return evaluateplanarPotentials(self._potlist,R,phi=phi,t=t,dR=1,
                                         dphi=1)
     def vcirc(self,R):
@@ -2351,7 +2351,7 @@ class mockMovingObjectPotential(testMWPotential):
         testMWPotential.__init__(self,[self._o1p,self._o2p])
         self.isNonAxi= True
         return None
-    def phi2deriv(self,R,z,phi=0.,t=0.):
+    def phi2deriv(self,R,z,phi=0.,t=0.,**kwargs):
         raise AttributeError
     def OmegaP(self):
         return 1./self._rc

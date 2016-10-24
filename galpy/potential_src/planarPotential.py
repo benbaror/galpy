@@ -230,7 +230,7 @@ class planarPotential(object):
         """
         return self._phiforce_nodecorator(R,phi=phi,t=t,v=v)
        
-    def _phiforce_nodecorator(self,R,phi=0.,t=0.,v=v):
+    def _phiforce_nodecorator(self,R,phi=0.,t=0.,v=None):
         # Separate, so it can be used during orbit integration
         try:
             return self._amp*self._phiforce(R,phi=phi,t=t,v=v)
